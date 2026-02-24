@@ -1,0 +1,55 @@
+
+services:
+  php:
+    build: .
+    container_name: my_php
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      MYSQL_HOST: mymysql
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: db
+    depends_on:
+      - mysql
+    networks:
+      - my_network
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: my_phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - my_network
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+    - "3306:3306"
+    volumes:
+      - dockertest_db_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: unless-stopped
+
+volumes:
+  dockertest_db_data:
+
+networks:
+  my_network:
+    driver: bridge
